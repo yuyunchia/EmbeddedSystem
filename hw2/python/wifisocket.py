@@ -1,10 +1,11 @@
 import socket
-import netifaces as ni
+#import netifaces as ni
 from config import config
 
 class WiFiSocket():
     def __init__(self) -> None:
-        self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
+        ## self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
+        self.bind_ip = "0.0.0.0"
         self.bind_port = config["bind_port"]
         self.socket_available = config["socket_available"]
         self.buffer_size = config["buffer_size"]
