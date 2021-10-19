@@ -24,11 +24,11 @@ def display_func(data):
 def main():
     # display_thread = threading.Thread(target = displaywindow.show)
     # display_thread.start()
-    displaywindow.show()
-    # wifisocket = WiFiSocket()
-    # wifisocket.start()
-    # wifisocket.server_listen(display_func=display_func)
-    #displaywindow.show()
+    # displaywindow.show()
+    wifisocket = WiFiSocket()
+    wifisocket.start()
+    wifisocket.server_listen(display_func=display_func)
+    # displaywindow.show()
     
 if __name__ == "__main__":
     main()
