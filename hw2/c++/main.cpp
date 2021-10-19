@@ -26,6 +26,7 @@
 #include "stm32l475e_iot01_accelero.h"
 #include <cstdint>
 #include <stdio.h>
+#include <string.h>
 
 #if MBED_CONF_APP_USE_TLS_SOCKET
 #include "root_ca_cert.h"
@@ -261,7 +262,8 @@ private:
 
         for (int i = 0; i < length; i++){
             char buffer[100];
-            bytes_to_send -= _socket.send(sprintf(buffer, "%d", data[i]))
+            sprintf(buffer, "%d\r\n", data[i]);
+            bytes_to_send -= _socket.send(buffer, strlen(buffer));
         }
 
         // printf("\r\nSending message: \r\n%s", data);
