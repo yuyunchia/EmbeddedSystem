@@ -11,6 +11,7 @@ class WiFiSocket():
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __data_parser(self, data):
+        
         return data
 
     def start(self):
