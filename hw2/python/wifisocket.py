@@ -12,7 +12,10 @@ class WiFiSocket():
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __data_parser(self, data):
-        return data
+        _data = data.split()
+        _data = (int(_data[0]), int(_data[1]), int(_data[2]))
+        print("Data to display: ", _data)
+        return 
 
     def start(self):
         self.server.bind((self.bind_ip, self.bind_port))
@@ -20,18 +23,28 @@ class WiFiSocket():
         print("Listening on %s:%d, with maximum socket available %d" % (self.bind_ip, self.bind_port, self.socket_available))
 
     def server_listen(self, display_func):
-        client, addr = self.server.accept()
-        print("Connected by ", addr)
-
         while True:
-            data = str(client.recv(self.buffer_size), encoding='utf-8')
-            print("Data from client: %s" % (data))
-            data = self.__data_parser(data)
+            print("Server Ready: ")
+            client, addr = self.server.accept()
+            print("Connected by ", addr)
+            while True:
+                try:
+                    data = str(client.recv(self.buffer_size), encoding='utf-8')
+                    print("Data from client: %s" % (data))
+                    data = self.__data_parser(data)
 
-            if data == "":
+                    if data == "":
+                        break
+                    if data == "close":
+                        self.server.close()
+                        return
+                    
+                    display_func(data)
+                except UnicodeDecodeError:
+                    print("Data format error")
+                    client.close()
+                    break
+            i = input("Connection close, end server?(y/n)")
+            if i == "y":
                 break
-            if data == "close":
-                self.server.close()
-                return
-            
-            display_func(data)
+        self.server.close()

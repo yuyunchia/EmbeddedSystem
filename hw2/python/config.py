@@ -1,5 +1,5 @@
 config = {
-    "bind_port": 4000,
+    "bind_port": 65431,
     "socket_available": 10,
     "buffer_size": 1024
 }

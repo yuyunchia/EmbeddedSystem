@@ -1,3 +1,19 @@
+/* Sockets Example
+ * Copyright (c) 2016-2020 ARM Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "mbed.h"
 #include "wifi_helper.h"
 #include "mbed-trace/mbed_trace.h"
@@ -8,20 +24,45 @@
 #include "stm32l475e_iot01_magneto.h"
 #include "stm32l475e_iot01_gyro.h"
 #include "stm32l475e_iot01_accelero.h"
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <stdio.h>
+#include <string.h>
+
+#if MBED_CONF_APP_USE_TLS_SOCKET
+#include "root_ca_cert.h"
+
+#ifndef DEVICE_TRNG
+#error "mbed-os-example-tls-socket requires a device which supports TRNG"
+#endif
+#endif // MBED_CONF_APP_USE_TLS_SOCKET
 
 class SocketDemo {
     static constexpr size_t MAX_NUMBER_OF_ACCESS_POINTS = 10;
     static constexpr size_t MAX_MESSAGE_RECEIVED_LENGTH = 100;
+
 //port要設多少
-    static constexpr size_t REMOTE_PORT = 65431; // use ports > 1023
+#if MBED_CONF_APP_USE_TLS_SOCKET
+    static constexpr size_t REMOTE_PORT = 443; // tls port
+#else
+    static constexpr size_t REMOTE_PORT = 4000; // use ports > 1023
+#endif // MBED_CONF_APP_USE_TLS_SOCKET
 
 public:
-    SocketDemo() : _net(NetworkInterface::get_default_instance()){}
-    ~SocketDemo(){
-        if (_net) _net->disconnect();
+    SocketDemo() : _net(NetworkInterface::get_default_instance())
+    {
     }
 
-    void run(){
+    ~SocketDemo()
+    {
+        if (_net) {
+            _net->disconnect();
+        }
+    }
+
+    void run()
+    {
         if (!_net) {
             printf("Error! No network interface found.\r\n");
             return;
@@ -29,7 +70,12 @@ public:
 
         /* if we're using a wifi interface run a quick scan */
         if (_net->wifiInterface()) {
-            wifi_scan()
+            /* the scan is not required to connect and only serves to show visible access points */
+            wifi_scan();
+
+            /* in this example we use credentials configured at compile time which are used by
+             * NetworkInterface::connect() but it's possible to do this at runtime by using the
+             * WiFiInterface::connect() which takes these parameters as arguments */
         }
 
         /* connect will perform the action appropriate to the interface type to connect to the network */
@@ -50,6 +96,18 @@ public:
             printf("Error! _socket.open() returned: %d\r\n", result);
             return;
         }
+
+#if MBED_CONF_APP_USE_TLS_SOCKET
+        result = _socket.set_root_ca_cert(root_ca_cert);
+        if (result != NSAPI_ERROR_OK) {
+            printf("Error: _socket.set_root_ca_cert() returned %d\n", result);
+            return;
+        }
+        _socket.set_hostname(MBED_CONF_APP_HOSTNAME);
+#endif // MBED_CONF_APP_USE_TLS_SOCKET
+
+        /* now we have to find where to connect */
+
         SocketAddress address;
 
         if (!resolve_hostname(address)) {
@@ -57,6 +115,9 @@ public:
         }
 
         address.set_port(REMOTE_PORT);
+
+        /* we are connected to the network but since we're using a connection oriented
+         * protocol we still need to open a connection on the socket */
 
         printf("Opening connection to remote port %d\r\n", REMOTE_PORT);
 
@@ -66,18 +127,17 @@ public:
             return;
         }
 
-        if (!send_http_request()) return;
-        if (!receive_http_response()) return;
-        
         sensor_data();
+        
         printf("Demo concluded successfully \r\n");
     }
 
 private:
-    void sensor_data(){
+    void sensor_data()
+    {
         float sensor_value = 0;
         int16_t pDataXYZ[3] = {0};
-        float pGyroDataXYZ[3] = {0};
+        //float pGyroDataXYZ[3] = {0};
 
         printf("Start sensor init\n");
 
@@ -88,49 +148,24 @@ private:
         BSP_MAGNETO_Init();
         BSP_GYRO_Init();
         BSP_ACCELERO_Init();
-
-        /////
-        sensor_value = BSP_TSENSOR_ReadTemp();
-        printf("\nTEMPERATURE = %.2f degC\n", sensor_value);
-
-
-        //////
-
-        /*
+        
         while(1) {
-            printf("\nNew loop, LED1 should blink during sensor read\n");
-
-            sensor_value = BSP_TSENSOR_ReadTemp();
-            printf("\nTEMPERATURE = %.2f degC\n", sensor_value);
-
-            sensor_value = BSP_HSENSOR_ReadHumidity();
-            printf("HUMIDITY    = %.2f %%\n", sensor_value);
-
-            sensor_value = BSP_PSENSOR_ReadPressure();
-            printf("PRESSURE is = %.2f mBar\n", sensor_value);
-
-            ThisThread::sleep_for(1000);
-
-            BSP_MAGNETO_GetXYZ(pDataXYZ);
-            printf("\nMAGNETO_X = %d\n", pDataXYZ[0]);
-            printf("MAGNETO_Y = %d\n", pDataXYZ[1]);
-            printf("MAGNETO_Z = %d\n", pDataXYZ[2]);
-
-            BSP_GYRO_GetXYZ(pGyroDataXYZ);
-            printf("\nGYRO_X = %.2f\n", pGyroDataXYZ[0]);
-            printf("GYRO_Y = %.2f\n", pGyroDataXYZ[1]);
-            printf("GYRO_Z = %.2f\n", pGyroDataXYZ[2]);
 
             BSP_ACCELERO_AccGetXYZ(pDataXYZ);
             printf("\nACCELERO_X = %d\n", pDataXYZ[0]);
             printf("ACCELERO_Y = %d\n", pDataXYZ[1]);
             printf("ACCELERO_Z = %d\n", pDataXYZ[2]);
 
+            send_data(pDataXYZ, sizeof(pDataXYZ) / sizeof(int16_t));
+
             ThisThread::sleep_for(1000);
+            
         }
-        */
+        
+
     }
-    bool resolve_hostname(SocketAddress &address){
+    bool resolve_hostname(SocketAddress &address)
+    {
         const char hostname[] = MBED_CONF_APP_HOSTNAME;
 
         /* get the host address */
@@ -145,7 +180,26 @@ private:
 
         return true;
     }
-    bool send_http_request(){
+    
+    bool send_data(int16_t data[], nsapi_size_or_error_t length) {
+        nsapi_size_or_error_t bytes_to_send = length;
+        char buffer[100];
+        sprintf(buffer, "\r\n ");
+        for (int i = 0; i < length; i++){
+            sprintf(buffer, "%s%d ", buffer, data[i]);
+        }
+        strcat(buffer, "\r\n");
+        
+        printf("\r\nSending message: %s\r\n", buffer);
+        _socket.send(buffer, strlen(buffer));
+
+        return true;
+    }
+    
+    
+
+    bool send_http_request()
+    {
         /* loop until whole request sent */
         const char buffer[] = "GET / HTTP/1.1\r\n"
                               "Host: ifconfig.io\r\n"
@@ -173,7 +227,9 @@ private:
 
         return true;
     }
-    bool receive_http_response(){
+
+    bool receive_http_response()
+    {
         char buffer[MAX_MESSAGE_RECEIVED_LENGTH];
         int remaining_bytes = MAX_MESSAGE_RECEIVED_LENGTH;
         int received_bytes = 0;
@@ -197,7 +253,9 @@ private:
 
         return true;
     }
-    void wifi_scan(){
+
+    void wifi_scan()
+    {
         WiFiInterface *wifi = _net->wifiInterface();
 
         WiFiAccessPoint ap[MAX_NUMBER_OF_ACCESS_POINTS];
@@ -221,7 +279,9 @@ private:
         }
         printf("\r\n");
     }
-    void print_network_info(){
+
+    void print_network_info()
+    {
         /* print the network info */
         SocketAddress a;
         _net->get_ip_address(&a);
@@ -234,10 +294,21 @@ private:
 
 private:
     NetworkInterface *_net;
+
+#if MBED_CONF_APP_USE_TLS_SOCKET
+    TLSSocket _socket;
+#else
     TCPSocket _socket;
+#endif // MBED_CONF_APP_USE_TLS_SOCKET
 };
 
 int main() {
+    printf("\r\nStarting socket demo\r\n\r\n");
+
+#ifdef MBED_CONF_MBED_TRACE_ENABLE
+    mbed_trace_init();
+#endif
+
     SocketDemo *example = new SocketDemo();
     MBED_ASSERT(example);
     example->run();
