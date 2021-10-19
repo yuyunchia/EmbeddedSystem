@@ -4,18 +4,18 @@ import random
 import threading
 import time
 
-displaywindow = DisplayWindow()
+# displaywindow = DisplayWindow()
 
-def updatedata():
-    t = 10000
-    while(t>0):
-        #t = t-1
-        data = ( random.randint(-10, 10), random.randint(-10, 10), random.randint(-10, 10) )
-        displaywindow.update(data)
-        time.sleep(0.001)
+# def updatedata():
+#     t = 10000
+#     while(t>0):
+#         #t = t-1
+#         data = ( random.randint(-10, 10), random.randint(-10, 10), random.randint(-10, 10) )
+#         displaywindow.update(data)
+#         time.sleep(0.001)
 
-t = threading.Thread(target = updatedata)
-t.start()
+# t = threading.Thread(target = updatedata)
+# t.start()
 
 def display_func(data):
     # print(data)

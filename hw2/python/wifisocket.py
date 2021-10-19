@@ -1,9 +1,10 @@
 import socket
+import netifaces as ni
 from config import config
 
 class WiFiSocket():
     def __init__(self) -> None:
-        self.bind_ip = config["bind_ip"]
+        self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
         self.bind_port = config["bind_port"]
         self.socket_available = config["socket_available"]
         self.buffer_size = config["buffer_size"]
@@ -18,19 +19,18 @@ class WiFiSocket():
         print("Listening on %s:%d, with maximum socket available %d" % (self.bind_ip, self.bind_port, self.socket_available))
 
     def server_listen(self, display_func):
+        client, addr = self.server.accept()
+        print("Connected by ", addr)
+
         while True:
-            client, addr = self.server.accept()
-            print("Connected by ", addr)
+            data = str(client.recv(self.buffer_size), encoding='utf-8')
+            print("Data from client: %s" % (data))
+            data = self.__data_parser(data)
 
-            while True:
-                data = str(client.recv(self.buffer_size), encoding='utf-8')
-                print("Data from client: %s" % (data))
-                data = self.__data_parser(data)
-
-                if data == "":
-                    break
-                if data == "close":
-                    self.server.close()
-                    return
-                
-                display_func(data)
+            if data == "":
+                break
+            if data == "close":
+                self.server.close()
+                return
+            
+            display_func(data)
