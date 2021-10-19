@@ -24,6 +24,7 @@
 #include "stm32l475e_iot01_magneto.h"
 #include "stm32l475e_iot01_gyro.h"
 #include "stm32l475e_iot01_accelero.h"
+#include <cstdint>
 
 #if MBED_CONF_APP_USE_TLS_SOCKET
 #include "root_ca_cert.h"
@@ -41,7 +42,7 @@ class SocketDemo {
 #if MBED_CONF_APP_USE_TLS_SOCKET
     static constexpr size_t REMOTE_PORT = 443; // tls port
 #else
-    static constexpr size_t REMOTE_PORT = 65431; // use ports > 1023
+    static constexpr size_t REMOTE_PORT = 4000; // use ports > 1023
 #endif // MBED_CONF_APP_USE_TLS_SOCKET
 
 public:
@@ -143,7 +144,7 @@ private:
     {
         float sensor_value = 0;
         int16_t pDataXYZ[3] = {0};
-        float pGyroDataXYZ[3] = {0};
+        //float pGyroDataXYZ[3] = {0};
 
         printf("Start sensor init\n");
 
@@ -154,17 +155,56 @@ private:
         BSP_MAGNETO_Init();
         BSP_GYRO_Init();
         BSP_ACCELERO_Init();
+        
+        while(1) {
+            /*
+            BSP_MAGNETO_GetXYZ(pDataXYZ);
+            printf("\nMAGNETO_X = %d\n", pDataXYZ[0]);
+            printf("MAGNETO_Y = %d\n", pDataXYZ[1]);
+            printf("MAGNETO_Z = %d\n", pDataXYZ[2]);
 
-        /////
-        sensor_value = BSP_TSENSOR_ReadTemp();
-        printf("\nTEMPERATURE = %.2f degC\n", sensor_value);
+            BSP_GYRO_GetXYZ(pGyroDataXYZ);
+            printf("\nGYRO_X = %.2f\n", pGyroDataXYZ[0]);
+            printf("GYRO_Y = %.2f\n", pGyroDataXYZ[1]);
+            printf("GYRO_Z = %.2f\n", pGyroDataXYZ[2]);
+            */
+
+            BSP_ACCELERO_AccGetXYZ(pDataXYZ);
+            printf("\nACCELERO_X = %d\n", pDataXYZ[0]);
+            printf("ACCELERO_Y = %d\n", pDataXYZ[1]);
+            printf("ACCELERO_Z = %d\n", pDataXYZ[2]);
+            
+
+            /*
+            nsapi_size_t bytes_to_send = sizeof(pDataXYZ) / sizeof(int16_t);
+            nsapi_size_or_error_t bytes_sent = 0;
+
+            printf("\r\nSending message: \r\n%s", pDataXYZ);
+
+            
+            while (bytes_to_send) {
+                bytes_sent = _socket.send(pDataXYZ + bytes_sent, bytes_to_send);
+                if (bytes_sent < 0) {
+                    printf("Error! _socket.send() returned: %d\r\n", bytes_sent);
+                } else {
+                    printf("sent %d bytes\r\n", bytes_sent);
+                }
+
+            bytes_to_send -= bytes_sent;
+
+            for(int i = pDataXYZ;)
+            */
+
+            send_data(pDataXYZ);
 
 
-        //////
-
+            ThisThread::sleep_for(1000);
+            
+        }
+        
         /*
         while(1) {
-            printf("\nNew loop, LED1 should blink during sensor read\n");
+            //printf("\nNew loop, LED1 should blink during sensor read\n");
 
             sensor_value = BSP_TSENSOR_ReadTemp();
             printf("\nTEMPERATURE = %.2f degC\n", sensor_value);
@@ -195,6 +235,7 @@ private:
             ThisThread::sleep_for(1000);
         }
         */
+
     }
     bool resolve_hostname(SocketAddress &address)
     {
@@ -212,6 +253,34 @@ private:
 
         return true;
     }
+    
+    bool send_data(int16_t data[])
+    {
+        nsapi_size_t bytes_to_send = sizeof(data) / sizeof(int16_t);
+        nsapi_size_or_error_t bytes_sent = 0;
+
+        printf("\r\nSending message: \r\n%s", data);
+
+        
+        while (bytes_to_send) {
+            bytes_sent = _socket.send(data + bytes_sent, bytes_to_send);
+            if (bytes_sent < 0) {
+                printf("Error! _socket.send() returned: %d\r\n", bytes_sent);
+                return false;
+            } else {
+                printf("sent %d bytes\r\n", bytes_sent);
+            }
+
+            bytes_to_send -= bytes_sent;
+        }
+        
+
+        printf("Complete message sent\r\n");
+
+        return true;
+    }
+    
+    
 
     bool send_http_request()
     {
