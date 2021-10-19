@@ -25,6 +25,7 @@
 #include "stm32l475e_iot01_gyro.h"
 #include "stm32l475e_iot01_accelero.h"
 #include <cstdint>
+#include <stdio.h>
 
 #if MBED_CONF_APP_USE_TLS_SOCKET
 #include "root_ca_cert.h"
@@ -195,7 +196,7 @@ private:
             for(int i = pDataXYZ;)
             */
 
-            send_data(pDataXYZ);
+            send_data(pDataXYZ, sizeof(pDataXYZ) / sizeof(int16_t));
 
 
             ThisThread::sleep_for(1000);
@@ -254,29 +255,36 @@ private:
         return true;
     }
     
-    bool send_data(int16_t data[])
-    {
-        nsapi_size_t bytes_to_send = sizeof(data) / sizeof(int16_t);
-        nsapi_size_or_error_t bytes_sent = 0;
+    bool send_data(int16_t data[], nsapi_size_or_error_t length) {
+        // nsapi_size_t bytes_to_send = sizeof(data) / sizeof(int16_t);
+        nsapi_size_or_error_t bytes_to_send = length;
 
-        printf("\r\nSending message: \r\n%s", data);
-
-        
-        while (bytes_to_send) {
-            bytes_sent = _socket.send(data + bytes_sent, bytes_to_send);
-            if (bytes_sent < 0) {
-                printf("Error! _socket.send() returned: %d\r\n", bytes_sent);
-                return false;
-            } else {
-                printf("sent %d bytes\r\n", bytes_sent);
-            }
-
-            bytes_to_send -= bytes_sent;
+        for (int i = 0; i < length; i++){
+            char buffer[100];
+            bytes_to_send -= _socket.send(sprintf(buffer, "%d", data[i]))
         }
+
+        // printf("\r\nSending message: \r\n%s", data);
+
+        
+        // while (bytes_to_send) {
+        //     bytes_sent = _socket.send(data + bytes_sent, bytes_to_send);
+        //     if (bytes_sent < 0) {
+        //         printf("Error! _socket.send() returned: %d\r\n", bytes_sent);
+        //         return false;
+        //     } else {
+        //         printf("sent %d bytes\r\n", bytes_sent);
+        //     }
+
+        //     bytes_to_send -= bytes_sent;
+        // }
         
 
-        printf("Complete message sent\r\n");
-
+        // printf("Complete message sent\r\n");
+        if (bytes_to_send > 0){
+            printf("Error, _socket.send() has %d bytes unsent\r\n", bytes_to_send);
+            return false;
+        }
         return true;
     }
     
