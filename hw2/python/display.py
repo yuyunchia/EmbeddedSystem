@@ -18,6 +18,9 @@ class DisplayWindow():
         self.ay = []
         self.az = []
 
+        self.id = 0
+        
+
       #   self.len = 40
       #   self.ax = [random.randint(-20, 4)+(points**1.88)/(random.randint(13, 14))
       # for points in range(0, 80, 2)]
@@ -53,19 +56,19 @@ class DisplayWindow():
         
         def animate(i):
 
-            if (i >= self.len):
-                return
+            if (i < self.len):
+                
 
-            x1.append(next(myvar))
-            y1.append((self.ax[i]))
-            y2.append((self.ay[i]))
-            y3.append((self.az[i]))
-        
-            axes.plot(x1, y1, color="red")
-            axes.plot(x1, y2, color="blue")
-            axes.plot(x1, y3, color="green")
+                x1.append(next(myvar))
+                y1.append((self.ax[i]))
+                y2.append((self.ay[i]))
+                y3.append((self.az[i]))
+            
+                axes.plot(x1, y1, color="red")
+                axes.plot(x1, y2, color="blue")
+                axes.plot(x1, y3, color="green")
 
-            axes.legend(['ax','ay','az'])
+                axes.legend(['ax','ay','az'])
         
                 
         # set ani variable to call the
