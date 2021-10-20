@@ -10,7 +10,6 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     while True:
-        # cmd = input("Input msg: ")
         cmd = "%d %d %d" % (random.randint(-100, 100), random.randint(-100, 100), random.randint(-100, 100))
         s.send(str.encode(cmd))
         time.sleep(0.5)
