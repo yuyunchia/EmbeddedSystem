@@ -1,4 +1,3 @@
-from itertools import count
 import socket
 import netifaces as ni
 import matplotlib.pyplot as plt
