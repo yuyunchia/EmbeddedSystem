@@ -1,4 +1,4 @@
-# EmbbedSystem
+# EmbeddedSystem
 
 ## Hw2
 
