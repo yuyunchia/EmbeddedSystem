@@ -1,7 +1,8 @@
 import socket
+import netifaces as ni
 
 def main():
-    HOST = "localhost"
+    HOST = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
     PORT = 4000
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

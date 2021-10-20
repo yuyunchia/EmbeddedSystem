@@ -1,5 +1,6 @@
 config = {
-    "bind_port": 65431,
+    "bind_port": 4000,
     "socket_available": 10,
-    "buffer_size": 1024
+    "buffer_size": 1024,
+    "display": True
 }
