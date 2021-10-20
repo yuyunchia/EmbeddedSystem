@@ -46,7 +46,7 @@ class WiFiSocket():
                         return
                     
                     if config["display"]:
-                        if len(x) != 0:
+                        if len(y1) != 1:
                             plt.clf()
                         y1.append(data[0])
                         y2.append(data[1])
