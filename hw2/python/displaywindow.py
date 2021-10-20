@@ -1,8 +1,5 @@
 # importing all necessary libraries
 from itertools import count
-import random
-import matplotlib
-from matplotlib import animation
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
