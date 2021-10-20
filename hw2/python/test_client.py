@@ -1,14 +1,19 @@
 import socket
+import netifaces as ni
+import random
+import time
 
 def main():
-    HOST = "127.0.0.1"
-    PORT = 65431
+    HOST = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
+    PORT = 4001
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     while True:
-        cmd = input("Input msg: ")
+        # cmd = input("Input msg: ")
+        cmd = "%d %d %d" % (random.randint(-100, 100), random.randint(-100, 100), random.randint(-100, 100))
         s.send(str.encode(cmd))
+        time.sleep(0.5)
 
 if __name__ == "__main__":
     main()

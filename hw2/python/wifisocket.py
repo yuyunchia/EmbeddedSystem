@@ -1,40 +1,46 @@
 import socket
-#import netifaces as ni
+import netifaces as ni
+import matplotlib.pyplot as plt
+
 from config import config
 
 import time
 
 class WiFiSocket():
     def __init__(self) -> None:
-        ## self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
-        self.bind_ip = "127.0.0.1"
+        self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
         self.bind_port = config["bind_port"]
         self.socket_available = config["socket_available"]
         self.buffer_size = config["buffer_size"]
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __data_parser(self, data):
-        _data = data.split()
-        _data = (int(_data[0]), int(_data[1]), int(_data[2]))
-        print("Data to display: ", _data)
-        return _data
+        data = data.split()
+        for i in range(len(data)):
+            data[i] = int(data[i])
+        return data
 
     def start(self):
         self.server.bind((self.bind_ip, self.bind_port))
         self.server.listen(self.socket_available)
         print("Listening on %s:%d, with maximum socket available %d" % (self.bind_ip, self.bind_port, self.socket_available))
 
-    def server_listen(self, displaywindow):
+    def server_listen(self):
         while True:
-            print("Server Ready: ")
+            print("Server Ready")
             client, addr = self.server.accept()
             print("Connected by ", addr)
+
+            # display
+            plt.ion()
+            y1, y2, y3 = [0], [0], [0]
+
             while True:
                 time.sleep(0.001)
                 try:
                     data = str(client.recv(self.buffer_size), encoding='utf-8')
-                    print("Data from client: %s" % (data))
                     data = self.__data_parser(data)
+                    print("Data from client: ", data)
 
                     if data == "":
                         break
@@ -42,18 +48,19 @@ class WiFiSocket():
                         self.server.close()
                         return
                     
-                    ##display_func(data)
-                    # print("in wifisocket.py display.id = ",displaywindow.id)
-                    # print("displaywindow.update()")
-                   
-                    displaywindow.update(data)
+                    if config["display"]:
+                        if len(y1) != 1:
+                            plt.clf()
+                        y1.append(data[0])
+                        y2.append(data[1])
+                        y3.append(data[2])
 
-                    # for i in range(displaywindow.len):
-                    #     print(displaywindow.ax[i])
-
-                  
-
-                    
+                        plt.plot(y1, color="red")
+                        plt.plot(y2, color="blue")
+                        plt.plot(y3, color="green")
+                        plt.legend(['ax','ay','az'])
+                        plt.draw()
+                        plt.pause(0.001)
 
                 except UnicodeDecodeError:
                     print("Data format error")
