@@ -1,5 +1,5 @@
 import socket
-import netifaces as ni
+#import netifaces as ni
 import matplotlib.pyplot as plt
 
 from config import config
@@ -8,7 +8,9 @@ import time
 
 class WiFiSocket():
     def __init__(self) -> None:
-        self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
+        #self.bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
+        self.bind_ip = "172.20.10.3"
+        #self.bind_ip = "0.0.0.0"
         self.bind_port = config["bind_port"]
         self.socket_available = config["socket_available"]
         self.buffer_size = config["buffer_size"]
@@ -31,7 +33,9 @@ class WiFiSocket():
             client, addr = self.server.accept()
             print("Connected by ", addr)
 
+
             # display
+            
             plt.ion()
             y1, y2, y3 = [0], [0], [0]
 
@@ -46,6 +50,7 @@ class WiFiSocket():
                         break
                     if data == "close":
                         self.server.close()
+
                         return
                     
                     if config["display"]:
@@ -54,6 +59,8 @@ class WiFiSocket():
                         y1.append(data[0])
                         y2.append(data[1])
                         y3.append(data[2])
+
+                        print(data[0], data[1], data[2])
 
                         plt.plot(y1, color="red")
                         plt.plot(y2, color="blue")
