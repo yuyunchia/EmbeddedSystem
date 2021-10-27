@@ -46,8 +46,7 @@ try:
     print (testService.getCharacteristics())
     for ch in testService.getCharacteristics():
         print (str(ch))
-    for ds in testService.getDescriptors():
-        print (str(ds))
+    
         
     ch= dev.getCharacteristics(uuid=UUID(0xfff1))[0]
     if (ch.supportsRead()):
