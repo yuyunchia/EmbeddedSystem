@@ -22,7 +22,7 @@ class MyDelegate(DefaultDelegate):
 
 
 def main():
-    print("Connecting...")
+    print("Connecting... ")
     dev = Peripheral('a8:9c:ed:a0:5e:fb', 'public')
 
     print("Services...")
