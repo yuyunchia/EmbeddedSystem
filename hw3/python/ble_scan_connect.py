@@ -1,14 +1,13 @@
+
 from bluepy.btle import Peripheral, UUID, ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM
 from bluepy.btle import Scanner, DefaultDelegate
 
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
-    def handleDiscovery(self, dev, isNewDev, isNewData):
-        if isNewDev:
-            print ("Discovered device", dev.addr)
-        elif isNewData:
-            print ("Received new data from", dev.addr)
+
+    def handleDiscovery(self, cHandle, data):
+        print(f"Data from handle {cHandle}: {data}")
                 
 scanner = Scanner().withDelegate(ScanDelegate())
 scanner.clear()
