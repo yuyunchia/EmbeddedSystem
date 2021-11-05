@@ -3,10 +3,10 @@
  
 class LEDService {
 public:
-    const static uint16_t LED_SERVICE_UUID              = 0xA002;
-    const static uint16_t LED_STATE_CHARACTERISTIC_UUID = 0xA003;
+    // const static uint16_t LED_SERVICE_UUID              = 0xA000;
+    // const static uint16_t LED_STATE_CHARACTERISTIC_UUID = 0xA002;
  
-    LEDService(BLE &_ble, bool initialValueForLEDCharacteristic) :
+    LEDService(BLE &_ble, bool initialValueForLEDCharacteristic, const uint16_t &LED_SERVICE_UUID, const uint16_t &LED_STATE_CHARACTERISTIC_UUID) :
         ble(_ble), ledState(LED_STATE_CHARACTERISTIC_UUID, &initialValueForLEDCharacteristic)
     {
         GattCharacteristic *charTable[] = {&ledState};
