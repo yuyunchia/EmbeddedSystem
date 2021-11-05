@@ -3,9 +3,6 @@
 
 class ButtonService {
 public:
-    // const static uint16_t BUTTON_SERVICE_UUID              = 0xA000;
-    // const static uint16_t BUTTON_STATE_CHARACTERISTIC_UUID = 0xA001;
-
     ButtonService(BLE &_ble, bool buttonPressedInitial, const uint16_t &BUTTON_SERVICE_UUID, const uint16_t &BUTTON_STATE_CHARACTERISTIC_UUID) :
         ble(_ble), buttonState(BUTTON_STATE_CHARACTERISTIC_UUID, &buttonPressedInitial, GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY)
     {
