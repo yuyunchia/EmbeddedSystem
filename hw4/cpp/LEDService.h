@@ -2,10 +2,7 @@
 #define __BLE_LED_SERVICE_H__
  
 class LEDService {
-public:
-    // const static uint16_t LED_SERVICE_UUID              = 0xA000;
-    // const static uint16_t LED_STATE_CHARACTERISTIC_UUID = 0xA002;
- 
+public: 
     LEDService(BLE &_ble, bool initialValueForLEDCharacteristic, const uint16_t &LED_SERVICE_UUID, const uint16_t &LED_STATE_CHARACTERISTIC_UUID) :
         ble(_ble), ledState(LED_STATE_CHARACTERISTIC_UUID, &initialValueForLEDCharacteristic)
     {
