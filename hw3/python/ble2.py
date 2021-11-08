@@ -31,7 +31,7 @@ def main():
 
     try:
         # while True:
-        service = dev.getServiceByUUID(0xfff0)
+        service = dev.getServiceByUUID(0xA000)
         charas = service.getCharacteristics()
         print("Num of characteristics: ", len(charas))
         print("Characteristics: ")
@@ -43,35 +43,42 @@ def main():
                 print("characteristic with uuid %s is not readible" % (str(c.uuid)))
         
 
-        testService = dev.getServiceByUUID(UUID(0xfff0))
+
+        testService = dev.getServiceByUUID(UUID(0xA000))
         print(testService.getCharacteristics())
         for ch in testService.getCharacteristics():
             print(str(ch))
+
+
+        # testService = dev.getServiceByUUID(UUID(0xfff0))
+        # print(testService.getCharacteristics())
+        # for ch in testService.getCharacteristics():
+        #     print(str(ch))
        
 
-        ch = dev.getCharacteristics(uuid=UUID(0xfff2))[0]
-        print(str(ch))
-        print(str(ch.propertiesToString()))
+        # ch = dev.getCharacteristics(uuid=UUID(0xfff2))[0]
+        # print(str(ch))
+        # print(str(ch.propertiesToString()))
 
      
 
-        dev.setDelegate(MyDelegate)
-        dev.writeCharacteristic((ch.getHandle()+1), "\x01\x00".encode())
+        # dev.setDelegate(MyDelegate())
+        # dev.writeCharacteristic((ch.getHandle()+1), "\x01\x00".encode())
 
       
-        while True:
-            if dev.waitForNotifications(3.0):
-                print("success enable")
-                continue
-              #  break
-            else:
-                print("fail enable")
+        # while True:
+        #     if dev.waitForNotifications(3.0):
+        #         print("success enable")
+        #         continue
+        #       #  break
+        #     else:
+        #         print("fail enable")
 
-        print('dev: ', dev)
-        ch = dev.getCharacteristics(uuid=UUID(0xfff2))[0]
-        print(ch)
-        if (ch.supportsRead()):
-            print(ch.read())
+        # print('dev: ', dev)
+        # ch = dev.getCharacteristics(uuid=UUID(0xfff2))[0]
+        # print(ch)
+        # if (ch.supportsRead()):
+        #     print(ch.read())
 
     finally:
         dev.disconnect()
