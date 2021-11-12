@@ -21,18 +21,17 @@ int main()
     float32_t duty_cycle = 0.5f;
     while(1){
     // specify period first
-    led.period(1.0f);      // 4 second period
-    led.write(duty_cycle);      // 50% duty cycle, relative to period
-    //ThisThread::sleep_for(5000);
+    led.period(0.02f);      // 20 ms period
+    led.write(duty_cycle);      
         while(duty_cycle < 1.0f){
-            led.write(duty_cycle);      // 50% duty cycle, relative to period
-            duty_cycle = duty_cycle + 0.1f ;
-            ThisThread::sleep_for(1000);
+            led.write(duty_cycle);      
+            duty_cycle = duty_cycle + 0.05f ;   // increase duty cycle
+            ThisThread::sleep_for(20);  // delay a period time
         }
         while(duty_cycle > 0){
-            led.write(duty_cycle);      // 50% duty cycle, relative to period
-            duty_cycle = duty_cycle - 0.1f ;
-            ThisThread::sleep_for(1000);
+            led.write(duty_cycle);      
+            duty_cycle = duty_cycle - 0.05f ; // decrease duty cycle
+            ThisThread::sleep_for(20);  // delay a period time
         }
     //led = 0.5f;          // shorthand for led.write()
     //led.pulsewidth(2);   // alternative to led.write, set duty cycle time in seconds
