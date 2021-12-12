@@ -1,11 +1,11 @@
 import socket
-##import netifaces as ni
+import netifaces as ni
 import random
 import time
 
 def main():
-    #HOST = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
-    HOST = "0.0.0.0"
+    HOST = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
+    # HOST = "0.0.0.0"
     PORT = 4000
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

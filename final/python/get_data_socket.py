@@ -1,8 +1,10 @@
 import socket
 import time
+import netifaces as ni
 
 def main():
-    bind_ip = "0.0.0.0"
+    # bind_ip = "192.168.43.215"
+    bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
     bind_port = 4000
     socket_available = 10
     buffer_size = 2048
@@ -12,7 +14,7 @@ def main():
     server.listen(socket_available)
     print("Listening on %s:%d, with maximum socket available %d" % (bind_ip, bind_port, socket_available))
 
-    with open("accelerator_data.txt", "w") as data_file:
+    with open("../data/accelerator_data.txt", "w") as data_file:
         while True:
             print("Server ready")
             client, addr = server.accept()
