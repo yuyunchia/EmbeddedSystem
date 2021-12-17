@@ -56,9 +56,10 @@ def train():
         train_acc = sum(train_acc) / len(train_acc)
         if best_acc < train_acc:
             best_acc = train_acc
-            save_path = os.path.join(config["model_save_dir"], "motion_%d.ckpt" % int(best_acc * 100))
-            print("Saving model at %s" % save_path)
-            torch.save(model.state_dict(), save_path)
+            if best_acc > 0.85:
+                save_path = os.path.join(config["model_save_dir"], "motion_%d.ckpt" % int(best_acc * 100))
+                print("Saving model at %s" % save_path)
+                torch.save(model.state_dict(), save_path)
         
         print(f"[Overall {e + 1:04d}/{epoch:04d}] train loss: {train_loss:.5f}, train acc: {train_acc:.5f}, best train acc:{best_acc:.5f}")
 
