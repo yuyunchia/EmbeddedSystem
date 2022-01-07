@@ -8,7 +8,6 @@
 #include "accelerator.h"
 
 #define MBED_CONF_APP_WIFI_SSID      "\"fy1928\""
-#define MBED_CONF_APP_WIFI_PASSWORD  "\"f1127EE1688\""
 #define DESTINATION_IP   "192.168.43.43"
 #define DESTINATION_PORT 4000
 

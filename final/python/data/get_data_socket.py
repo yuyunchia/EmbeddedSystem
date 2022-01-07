@@ -14,7 +14,7 @@ def main():
     server.listen(socket_available)
     print("Listening on %s:%d, with maximum socket available %d" % (bind_ip, bind_port, socket_available))
 
-    with open("../data/left_data.txt", "w") as data_file:
+    with open("../../data/4_data.txt", "w") as data_file:
         while True:
             print("Server ready")
             client, addr = server.accept()

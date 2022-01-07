@@ -23,9 +23,10 @@ if __name__ == "__main__":
                         _l = l.split()
                         data = _l[: 24]
                         label = _l[-1]
-                        writer.writerow({
-                            "motion": " ".join(data),
-                            "label": label
-                        })
+                        if label in "rlsn":
+                            writer.writerow({
+                                "motion": " ".join(data),
+                                "label": label
+                            })
                     txt_file.close()
         csv_file.close()
