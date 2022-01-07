@@ -14,7 +14,7 @@ def main():
     server.listen(socket_available)
     print("Listening on %s:%d, with maximum socket available %d" % (bind_ip, bind_port, socket_available))
 
-    with open("../data/accelerator_data.txt", "w") as data_file:
+    with open("../../data/4_data.txt", "w") as data_file:
         while True:
             print("Server ready")
             client, addr = server.accept()
@@ -31,11 +31,13 @@ def main():
                         break
                     if choise not in ['l', 'r', 'n', 's']:
                         print("Don't have the choise: %s" % choise)
+		            
                     data_file.write("%s -> %s\n" % (data, choise))
                 except UnicodeDecodeError:
                     print("Data format error")
                     client.close()
                     break
+            server.close()
 
 
 if __name__ == "__main__":

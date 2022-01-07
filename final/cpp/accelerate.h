@@ -1,12 +1,16 @@
 #include "ThisThread.h"
 #include "mbed.h"
+#include "mbed-trace/mbed_trace.h"
 #include "stm32l475e_iot01_gyro.h"
 #include "stm32l475e_iot01_accelero.h"
 #include <chrono>
-#include <cstdint>
-#include <cstdio>
 #include <stdio.h>
 #include <vector>
+#include <string.h>
+#include <cstring>
+#include <stdlib.h>
+#include <cstdint>
+#include <cstdio>
 
 #define MAX_CALLIBRATE_NUM 1024
 #define SAMPLE_TIME_INTERVAL 50
@@ -167,17 +171,17 @@ public:
         return true;
     }
     // Get current data, need to decide how to pass data to others
-    void get_data(vector<float*> buffer, const bool &refresh=true){
+    void get_data(vector<vector<int16_t>> &buffer, const bool &refresh=true){
         if (refresh)
             buffer.clear();
-        float data[6];
         for (int i = 0; i < sequense_length; i++){
-            data[0] = acce_x[i];
-            data[1] = acce_y[i];
-            data[2] = acce_z[i];
-            data[3] = gyro_x[i];
-            data[4] = gyro_y[i];
-            data[5] = gyro_z[i];
+            vector<int16_t> data;
+            data.push_back((int16_t)acce_x[i]);
+            data.push_back((int16_t)acce_y[i]);
+            data.push_back((int16_t)acce_z[i]);
+            // data.push_back((int16_t)gyro_x[i]);
+            // data.push_back((int16_t)gyro_y[i]);
+            // data.push_back((int16_t)gyro_z[i]);
             buffer.push_back(data);
         }
     }
@@ -199,15 +203,15 @@ public:
         printf("\n");
         printf("Seq gyro_x: ");
         for (int i = 0; i < sequense_length; i++)
-            printf("%d ", int16_t(acce_x[i]));
+            printf("%d ", int16_t(gyro_x[i]));
         printf("\n");
         printf("Seq gyro_y: ");
         for (int i = 0; i < sequense_length; i++)
-            printf("%d ", int16_t(acce_y[i]));
+            printf("%d ", int16_t(gyro_y[i]));
         printf("\n");
         printf("Seq gyro_z: ");
         for (int i = 0; i < sequense_length; i++)
-            printf("%d ", int16_t(acce_z[i]));
+            printf("%d ", int16_t(gyro_z[i]));
         printf("\n");
     }
     // Print current offset
@@ -252,18 +256,4 @@ private:
     float *gyro_x;
     float *gyro_y;
     float *gyro_z;
-    
 };
-
-// main() runs in its own thread in the OS
-int main(){
-    Accelerator accelerator;
-    accelerator.init(128, 128);
-
-    while (true) {
-        accelerator.print_offset();
-        accelerator.print_data();
-        accelerator.update_current(4);
-        ThisThread::sleep_for(chrono::seconds(5));
-    }
-}
