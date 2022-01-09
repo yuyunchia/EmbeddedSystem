@@ -23,7 +23,7 @@
 
 #include "motion_detect.h"
 
-MOTION_DETECT::MOTION_DETECT(q7_t* motiondata_buffer)
+MOTION_DETECT::MOTION_DETECT(q15_t* motiondata_buffer)
 {
   motion_nn = new MOTION_NN();
   motiondata = motiondata_buffer;
@@ -47,9 +47,9 @@ void MOTION_DETECT::init_motion_detect()
   // int mfcc_dec_bits = motion_nn->get_in_dec_bits();
   num_out_classes = motion_nn->get_num_out_classes();
   
-  output = new q7_t[num_out_classes];
-  averaged_output = new q7_t[num_out_classes];
-  predictions = new q7_t[sliding_window_len*num_out_classes];
+  output = new q15_t[num_out_classes];
+  averaged_output = new q15_t[num_out_classes];
+  predictions = new q15_t[sliding_window_len*num_out_classes];
   // audio_block_size = recording_win*frame_shift;
   // audio_buffer_size = audio_block_size + frame_len - frame_shift;
 }
@@ -60,10 +60,10 @@ void MOTION_DETECT::classify()
   // motion_nn->run_nn(mfcc_buffer, output);
   motion_nn->run_nn(motiondata, output);
   // Softmax
-  arm_softmax_q7(output,num_out_classes,output);
+  arm_softmax_q15(output,num_out_classes,output);
 }
 
-int MOTION_DETECT::get_top_class(q7_t* prediction)
+int MOTION_DETECT::get_top_class(q15_t* prediction)
 {
   int max_ind=0;
   int max_val=-128;
@@ -79,16 +79,16 @@ int MOTION_DETECT::get_top_class(q7_t* prediction)
 void MOTION_DETECT::average_predictions()
 {
   // shift the old predictions left
-  arm_copy_q7((q7_t *)(predictions+num_out_classes), (q7_t *)predictions, (sliding_window_len-1)*num_out_classes);
+  arm_copy_q15((q15_t *)(predictions+num_out_classes), (q15_t *)predictions, (sliding_window_len-1)*num_out_classes);
   // add new predictions at the end
-  arm_copy_q7((q7_t *)output, (q7_t *)(predictions+(sliding_window_len-1)*num_out_classes), num_out_classes);
+  arm_copy_q15((q15_t *)output, (q15_t *)(predictions+(sliding_window_len-1)*num_out_classes), num_out_classes);
   //compute averages
   int sum;
   for(int j=0;j<num_out_classes;j++) {
     sum=0;
     for(int i=0;i<sliding_window_len;i++) 
       sum += predictions[i*num_out_classes+j];
-    averaged_output[j] = (q7_t)(sum/sliding_window_len);
+    averaged_output[j] = (q15_t)(sum/sliding_window_len);
   }   
 }
   

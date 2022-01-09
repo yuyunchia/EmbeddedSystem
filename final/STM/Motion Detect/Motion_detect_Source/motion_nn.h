@@ -28,44 +28,26 @@
 
   10x25 input features
     |
-   IP1 : Innerproduct (weights: 24x144)
+   IP1 : Innerproduct (weights: 24x64)
     |
-   IP2 : Innerproduct (weights: 144x144)
+   IP2 : Innerproduct (weights: 64x16)
     |
-   IP3 : Innerproduct (weights: 144x144)
+   IP3 : Innerproduct (weights: 16x4)
     |
-   IP4 : Innerproduct (weights: 144x12)
-    |
-   12 outputs
+   4 outputs
 
 */
 
 
 
 
-// #define SAMP_FREQ 16000
-// #define MFCC_DEC_BITS 2
-// #define FRAME_SHIFT_MS 40
-// #define FRAME_SHIFT ((int16_t)(SAMP_FREQ * 0.001 * FRAME_SHIFT_MS))
-// #define NUM_FRAMES 25
-// #define NUM_MFCC_COEFFS 10
-// #define MFCC_BUFFER_SIZE (NUM_FRAMES*NUM_MFCC_COEFFS)
-// #define FRAME_LEN_MS 40
-// #define FRAME_LEN ((int16_t)(SAMP_FREQ * 0.001 * FRAME_LEN_MS))
-
-// #define IN_DIM (NUM_FRAMES*NUM_MFCC_COEFFS)
-
-
-
 #define IN_DIM 24
-#define OUT_DIM 12
-#define IP1_OUT_DIM 144
-#define IP2_OUT_DIM 144
-#define IP3_OUT_DIM 144
+#define OUT_DIM 4
+#define IP1_OUT_DIM 64
+#define IP2_OUT_DIM 16
 #define IP1_WT_DIM (IP1_OUT_DIM*IN_DIM)
 #define IP2_WT_DIM (IP2_OUT_DIM*IP1_OUT_DIM)
-#define IP3_WT_DIM (IP3_OUT_DIM*IP2_OUT_DIM)
-#define IP4_WT_DIM (OUT_DIM*IP3_OUT_DIM)
+#define IP3_WT_DIM (OUT_DIM*IP2_OUT_DIM)
 #define SCRATCH_BUFFER_SIZE (2*(IN_DIM+3*IP1_OUT_DIM))
 
 class MOTION_NN {
@@ -73,7 +55,7 @@ class MOTION_NN {
   public:
     MOTION_NN();
     ~MOTION_NN();
-    void run_nn(q7_t* in_data, q7_t* out_data);
+    void run_nn(q15_t* in_data, q15_t* out_data);
   
     // int get_num_frames();
     // int get_frame_len();
@@ -90,19 +72,17 @@ class MOTION_NN {
     // int in_dec_bits;
 
   private:
-    q7_t* scratch_pad;
-    q7_t* ip1_out;
-    q7_t* ip2_out;
-    q7_t* ip3_out;
+    q15_t* scratch_pad;
+    q15_t* ip1_out;
+    q15_t* ip2_out;
+    q15_t* ip3_out;
     q15_t* vec_buffer;
-    static q7_t const ip1_wt[IP1_WT_DIM];
-    static q7_t const ip1_bias[IP1_OUT_DIM];
-    static q7_t const ip2_wt[IP2_WT_DIM];
-    static q7_t const ip2_bias[IP2_OUT_DIM];
-    static q7_t const ip3_wt[IP3_WT_DIM];
-    static q7_t const ip3_bias[IP3_OUT_DIM];
-    static q7_t const ip4_wt[IP4_WT_DIM];
-    static q7_t const ip4_bias[OUT_DIM];
+    static q15_t const ip1_wt[IP1_WT_DIM];
+    static q15_t const ip1_bias[IP1_OUT_DIM];
+    static q15_t const ip2_wt[IP2_WT_DIM];
+    static q15_t const ip2_bias[IP2_OUT_DIM];
+    static q15_t const ip3_wt[IP3_WT_DIM];
+    static q15_t const ip3_bias[OUT_DIM];
 
 };
 

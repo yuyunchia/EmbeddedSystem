@@ -27,18 +27,18 @@ class MOTION_DETECT{
 
 public:
   ~MOTION_DETECT();
-  MOTION_DETECT(q7_t* motiondata_buffer);
+  MOTION_DETECT(q15_t* motiondata_buffer);
 
   void classify();
   void average_predictions();
-  int get_top_class(q7_t* prediction);
+  int get_top_class(q15_t* prediction);
   //int16_t* audio_buffer;
 
-  q7_t *motiondata;
+  q15_t *motiondata;
 
-  q7_t *output;
-  q7_t *predictions;
-  q7_t *averaged_output;
+  q15_t *output;
+  q15_t *predictions;
+  q15_t *averaged_output;
   // int num_frames;
 
   // int frame_len;
