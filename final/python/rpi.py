@@ -1,5 +1,6 @@
 from bluepy.btle import Peripheral, UUID, ADDR_TYPE_PUBLIC, Scanner, DefaultDelegate
 import time
+import RPi.GPIO as GPIO
 
 DEVICE_MAC = "fd:d2:cc:13:77:3f"
 MODE = "random"
@@ -8,17 +9,29 @@ def light_mode(mode):
     print(mode)
     if mode == b"r":
         # TODO
+        GPIO.output(5, GPIO.HIGH)
+        time.sleep(1)
+        GPIO.output(5, GPIO.LOW)
         print("Turn right")
         pass
     if mode == b"l":
         # TODO
+        GPIO.output(5, GPIO.HIGH)
+        time.sleep(1)
+        GPIO.output(5, GPIO.LOW)
         print("Turn left")
         pass
     if mode == b"s":
         # TODO
+        GPIO.output(5, GPIO.HIGH)
+        time.sleep(1)
+        GPIO.output(5, GPIO.LOW)
         print("Stopping")
         pass
     if mode == b"n":
+        GPIO.output(5, GPIO.HIGH)
+        time.sleep(1)
+        GPIO.output(5, GPIO.LOW)
         print("Nothing to do")
         pass
 
@@ -29,6 +42,14 @@ def main():
     print("Services...")
     for svc in dev.services:
         print(str(svc.uuid))
+    
+    # use RPi board pin numbers
+    GPIO.setmode(GPIO.BCM)
+
+    GPIO.setup(5, GPIO.OUT)
+    GPIO.setup(6, GPIO.OUT)
+    GPIO.setup(13, GPIO.OUT)
+    GPIO.setup(19, GPIO.OUT)
 
     try:
         while True:
