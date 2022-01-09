@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import os
+import numpy as np
 
 from motionnet import MotionNet
 from motionset import MotionSet
@@ -16,6 +17,14 @@ config = {
     "model_save_dir": "../../models",
     "loss_fn": torch.nn.CrossEntropyLoss()
 }
+
+def hook(module, feat_in, feat_out: torch.TensorType):
+    p = feat_out.detach().cpu().numpy()
+    min_value, max_value = np.min(p), np.max(p)
+    print("Min: %f, max: %f" % (min_value, max_value))
+    int_bits = int(np.ceil(np.log2(max(abs(min_value), abs(max_value)))))
+    dec_bits = 15 - int_bits
+    print("Int bits: %d, dec bits: %d" % (int_bits, dec_bits))
 
 def train():
     train_set = MotionSet(config["data_dir"])
@@ -32,6 +41,9 @@ def train():
     optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
     loss_fn = config["loss_fn"]
 
+    for layer in model.mlp.children():
+        if isinstance(layer, torch.nn.Linear):
+            layer.register_forward_hook(hook=hook)
 
     best_acc = 0.0
     model.train()
