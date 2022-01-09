@@ -5,14 +5,16 @@ import numpy as np
 from motionnet import MotionNet
 
 config = {
-    "model_dir": "../../models/motion_88.ckpt"
+    "model_dir": "../../models/motion_90.ckpt"
 }
 
 def write_params(params: torch.TensorType, file: FileIO, name: str):
     p = params.data.numpy()
     min_value, max_value = np.min(p), np.max(p)
+    print("Min: %f, max: %f" % (min_value, max_value))
     int_bits = int(np.ceil(np.log2(max(abs(min_value), abs(max_value)))))
     dec_bits = 15 - int_bits
+    print("Int bits: %d, dec bits: %d" % (int_bits, dec_bits))
 
     p = np.round(p * (2 ** dec_bits))
     
