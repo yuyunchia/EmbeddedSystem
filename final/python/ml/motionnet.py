@@ -12,7 +12,7 @@ class MotionNet(nn.Module):
             nn.Dropout(0.3),
             nn.ReLU(inplace=True),
             nn.Linear(16, output_dim),
-            nn.Tanh()
+            nn.Softmax()
         )
 
     def forward(self, x):
