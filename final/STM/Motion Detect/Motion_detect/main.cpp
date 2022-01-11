@@ -47,6 +47,9 @@ int16_t motiondata_buffer[24] = {-81, 21, 128, 2, 149, 179, 53, -34, 73, -269, 6
 
 
 int16_t left_wavadata[24*LEFT_WAVEDATA_NUMBER] = LEFT_WAVEDATA;
+int16_t right_wavadata[24*RIGHT_WAVEDATA_NUMBER] = RIGHT_WAVEDATA;
+int16_t stop_wavadata[24*STOP_WAVEDATA_NUMBER] = STOP_WAVEDATA;
+int16_t nothing_wavadata[24*NOTHING_WAVEDATA_NUMBER] = NOTHING_WAVEDATA;
 
 // Timer T;
 // //Serial pc(USBTX, USBRX);
@@ -100,18 +103,72 @@ int main()
   
   MOTION_DETECT motiondetect(motiondata_buffer);
 
+  int fusion_matrix[4][4] = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
+
 
 
   printf("start test !\n");
+
+  printf("\ntest Left !\n");
+
   for (int dataindex = 0; dataindex < LEFT_WAVEDATA_NUMBER; dataindex++){
     update_motiondata_buffer(dataindex, left_wavadata);
     
     motiondetect.classify();	  //classify using dnn
 
     int max_ind = motiondetect.get_top_class(motiondetect.output);
-    printf("Detected %s (%d%%)\r\n",output_class[max_ind],((int)motiondetect.output[max_ind]*100/128));
-
+    // printf("Detected %s (%d%%)\r\n",output_class[max_ind],((int)motiondetect.output[max_ind]*100/128));
+  
+    fusion_matrix[0][max_ind] += 1;
   }
+
+  printf("\ntest Right !\n");
+
+  for (int dataindex = 0; dataindex < RIGHT_WAVEDATA_NUMBER; dataindex++){
+    update_motiondata_buffer(dataindex, right_wavadata);
+    
+    motiondetect.classify();	  //classify using dnn
+
+    int max_ind = motiondetect.get_top_class(motiondetect.output);
+    // printf("Detected %s (%d%%)\r\n",output_class[max_ind],((int)motiondetect.output[max_ind]*100/128));
+
+    fusion_matrix[1][max_ind] += 1;
+  }
+
+  printf("\ntest stop !\n");
+
+  for (int dataindex = 0; dataindex < STOP_WAVEDATA_NUMBER; dataindex++){
+    update_motiondata_buffer(dataindex, stop_wavadata);
+    
+    motiondetect.classify();	  //classify using dnn
+
+    int max_ind = motiondetect.get_top_class(motiondetect.output);
+    // printf("Detected %s (%d%%)\r\n",output_class[max_ind],((int)motiondetect.output[max_ind]*100/128));
+  
+    fusion_matrix[2][max_ind] += 1;
+  }
+
+  printf("\ntest nothing !\n");
+
+  for (int dataindex = 0; dataindex < NOTHING_WAVEDATA_NUMBER; dataindex++){
+    update_motiondata_buffer(dataindex, nothing_wavadata);
+    
+    motiondetect.classify();	  //classify using dnn
+
+    int max_ind = motiondetect.get_top_class(motiondetect.output);
+    // printf("Detected %s (%d%%)\r\n",output_class[max_ind],((int)motiondetect.output[max_ind]*100/128));
+  
+    fusion_matrix[3][max_ind] += 1;
+  }
+
+  printf("|       |left   |right  |stop   |nothing|\n");
+  printf("|left   |    %3d|    %3d|    %3d|    %3d|\n",fusion_matrix[0][0],fusion_matrix[0][1],fusion_matrix[0][2],fusion_matrix[0][3]);
+  printf("|right  |    %3d|    %3d|    %3d|    %3d|\n",fusion_matrix[1][0],fusion_matrix[1][1],fusion_matrix[1][2],fusion_matrix[1][3]);
+  printf("|stop   |    %3d|    %3d|    %3d|    %3d|\n",fusion_matrix[2][0],fusion_matrix[2][1],fusion_matrix[2][2],fusion_matrix[2][3]);
+  printf("|nothing|    %3d|    %3d|    %3d|    %3d|\n",fusion_matrix[3][0],fusion_matrix[3][1],fusion_matrix[3][2],fusion_matrix[3][3]);
+
+
+
 
   printf("end test !\n\n");
   

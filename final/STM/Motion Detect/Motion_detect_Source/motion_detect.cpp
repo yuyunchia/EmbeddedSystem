@@ -66,7 +66,7 @@ void MOTION_DETECT::classify()
 int MOTION_DETECT::get_top_class(q15_t* prediction)
 {
   int max_ind=0;
-  int max_val=-128;
+  int max_val=-32768; // -2^15
   for(int i=0;i<num_out_classes;i++) {
     if(max_val<prediction[i]) {
       max_val = prediction[i];
