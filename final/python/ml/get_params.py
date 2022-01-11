@@ -1,4 +1,6 @@
 from io import FileIO
+
+from numpy.core.fromnumeric import transpose
 import torch
 import numpy as np
 
@@ -20,10 +22,14 @@ def write_params(params: torch.TensorType, file: FileIO, name: str):
     
     file.write("#define " + name + " {")
 
-    transposed_weights = np.transpose(p)
+    ## transposed_weights = np.transpose(p)  // need not transpose
 
-    transposed_weights.tofile(file, sep=", ", format="%d")
+    p.tofile(file, sep=", ", format="%d")
     file.write("}\n")
+
+
+   
+
 
 def get_params():
     model = MotionNet()
@@ -31,11 +37,13 @@ def get_params():
     
     layer_name = ["LINEAR_1_WT", "LINEAR_1_BIAS", "LINEAR_2_WT", "LINEAR_2_BIAS", "LINEAR_3_WT", "LINEAR_3_BIAS"]
 
+   
     with open("../../cpp/weight.h", "w+") as file:
         for i, params in enumerate(model.parameters()):
-            print(params.shape)
+            #print(params.shape)
             write_params(params, file, layer_name[i])
-                
 
+                
 if __name__ == "__main__":
     get_params()
+    
