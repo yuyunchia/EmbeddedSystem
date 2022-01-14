@@ -7,7 +7,7 @@ import numpy as np
 from motionnet import MotionNet
 
 config = {
-    "model_dir": "../../models/motion_90.ckpt"
+    "model_dir": "../../models/motion_87.ckpt"
 }
 
 def write_params(params: torch.TensorType, file: FileIO, name: str):
