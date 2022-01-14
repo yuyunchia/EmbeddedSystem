@@ -26,7 +26,7 @@ def transformation():
             right.extend(data)
         elif label == "s":
             stop.extend(data)
-        else:
+        elif label == 'n':
             nothing.extend(data)
     
     left = np.array(left)

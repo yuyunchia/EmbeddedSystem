@@ -5,7 +5,7 @@ import netifaces as ni
 def main():
     # bind_ip = "192.168.43.215"
     bind_ip = ni.ifaddresses('en0')[ni.AF_INET][0]['addr']
-    bind_port = 3000
+    bind_port = 4000
     socket_available = 10
     buffer_size = 2048
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,7 +14,7 @@ def main():
     server.listen(socket_available)
     print("Listening on %s:%d, with maximum socket available %d" % (bind_ip, bind_port, socket_available))
 
-    with open("../../data/raw_test.txt", "w") as data_file:
+    with open("../../data/raw_none4.txt", "w") as data_file:
         total_data = []
         while True:
             print("Server ready")
