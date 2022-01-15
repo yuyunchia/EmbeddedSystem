@@ -131,6 +131,91 @@ def run_inference():
 
 
 
+def run_quantize_inference():
+    model = MotionNet()
+    model.load_state_dict(torch.load(config["model_dir"], map_location="cpu"))
+
+    p_weight = 0
+
+    for i, params in enumerate(model.parameters()):
+        ##print(params.shape)
+        p = params.data.numpy()
+
+        ## quantize
+        min_value, max_value = np.min(p), np.max(p)
+        int_bits = int(np.ceil(np.log2(max(abs(min_value), abs(max_value)))))
+        dec_bits = 15 - int_bits
+        p = np.round(p * (2 ** dec_bits))
+        p = p/(2**dec_bits)
+        ## quantize
+
+        ## flatten
+        if (i == 0):
+            p_weight = p.flatten()
+        else:
+            p_weight = np.concatenate( (p_weight, p.flatten()) )
+
+        ##print(p.size)
+
+        
+    net = Motionnet_Inference()
+
+
+
+    index_to_label = {
+        0: 'left',
+        1: 'right',
+        2: 'stop',
+        3: 'none'
+    }
+
+    net = Motionnet_Inference()
+   
+
+    net.load_weights(p_weight)
+
+    confusion_matrix = np.zeros( (4,4))
+    '''
+              left|  right|   stop|nothing|
+       left|      |       |       |       |
+      right|      |       |       |       |
+       stop|      |       |       |       |
+    nothing|      |       |       |       |
+    '''
+
+    data = pd.read_csv(config["data_dir"])
+    data = data.values
+    num = len(data)
+
+    for i in range(num):
+        label = data[i][1] ## 
+        inputdata = data[i][0].split(' ')
+        inputdata = [int(item) for item in inputdata]
+        inputdata = np.array(inputdata)
+
+        predictions = net.quantize_forward(inputdata)
+        predicted_labels = np.argmax(predictions, axis=0)
+        #print(index_to_label[predicted_labels])
+
+        if (label == 'l'):
+            confusion_matrix[0][predicted_labels] += 1
+        elif(label == 'r'):
+            confusion_matrix[1][predicted_labels] += 1
+        elif(label == 's'):
+            confusion_matrix[2][predicted_labels] += 1
+        elif(label == 'n'):
+            confusion_matrix[3][predicted_labels] += 1
+    
+
+    print("result of: ",config["model_dir"])
+    print("            left|   right|    stop| nothing|")
+    print("   left|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[0][0],confusion_matrix[0][1],confusion_matrix[0][2],confusion_matrix[0][3]) )
+    print("  right|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[1][0],confusion_matrix[1][1],confusion_matrix[1][2],confusion_matrix[1][3]) )
+    print("   stop|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[2][0],confusion_matrix[2][1],confusion_matrix[2][2],confusion_matrix[2][3]) )
+    print("nothing|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[3][0],confusion_matrix[3][1],confusion_matrix[3][2],confusion_matrix[3][3]) )
+
+
+
 
 
 
