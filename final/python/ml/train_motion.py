@@ -8,7 +8,7 @@ from motionnet import MotionNet
 from motionset import MotionSet
 
 config = {
-    "data_dir": "../../data/total_data.csv",
+    "data_dir": "../../data/filter_data_raw_80_1.csv",
     "device": "cuda" if torch.cuda.is_available() else "cpu",
     "batch_size": 4,
     "lr": 1e-5,

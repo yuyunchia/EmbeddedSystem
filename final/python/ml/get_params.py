@@ -12,8 +12,8 @@ from motionnet_inference import Motionnet_Inference
 
 
 config = {
-    "model_dir": "../../models/motion_90.ckpt",
-    "data_dir" : "../../data/total_data.csv"
+    "model_dir": "../../models/motion_85.ckpt",
+    "data_dir" : "../../data/filter_data_raw_80_1.csv"
 }
 
 def write_params(params: torch.TensorType, file: FileIO, name: str):
@@ -103,7 +103,7 @@ def run_inference():
     for i in range(num):
         label = data[i][1] ## 
         inputdata = data[i][0].split(' ')
-        inputdata = [int(item) for item in inputdata]
+        inputdata = [float(item) for item in inputdata]
         inputdata = np.array(inputdata)
 
         predictions = net.forward(inputdata)
@@ -177,7 +177,7 @@ def run_inference():
     for i in range(num):
         label = data[i][1] ## 
         inputdata = data[i][0].split(' ')
-        inputdata = [int(item) for item in inputdata]
+        inputdata = [float(item) for item in inputdata]
         inputdata = np.array(inputdata)
 
         predictions = net.forward(inputdata)
@@ -265,7 +265,7 @@ def run_quantize_inference():
     for i in range(num):
         label = data[i][1] ## 
         inputdata = data[i][0].split(' ')
-        inputdata = [int(item) for item in inputdata]
+        inputdata = [float(item) for item in inputdata]
         inputdata = np.array(inputdata)
 
         predictions = net.quantize_forward(inputdata)
