@@ -25,5 +25,6 @@ class MotionSet(Dataset):
         data = self.file.iloc[index]["motion"].split()
         label = map_label(self.file.iloc[index]["label"])
         for i in range(len(data)):
-            data[i] = float(data[i]) / self.max
+            #data[i] = float(data[i]) / self.max
+            data[i] = float(data[i])
         return torch.Tensor(data), label

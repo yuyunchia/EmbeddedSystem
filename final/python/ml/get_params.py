@@ -12,8 +12,8 @@ from motionnet_inference import Motionnet_Inference
 
 
 config = {
-    "model_dir": "../../models/motion_85.ckpt",
-    "data_dir" : "../../data/filter_data_raw_80_1.csv"
+    "model_dir": "../../models/motion_80.ckpt",
+    "data_dir" : "../../data/total_data.csv"
 }
 
 def write_params(params: torch.TensorType, file: FileIO, name: str):
@@ -100,6 +100,11 @@ def run_inference():
     data = data.values
     num = len(data)
 
+    la = 0
+    ra = 0
+    sa = 0
+    na = 0
+
     for i in range(num):
         label = data[i][1] ## 
         inputdata = data[i][0].split(' ')
@@ -111,12 +116,24 @@ def run_inference():
         #print(index_to_label[predicted_labels])
 
         if (label == 'l'):
+            la += 1
+            if (la > 300):
+                continue
             confusion_matrix[0][predicted_labels] += 1
         elif(label == 'r'):
+            ra += 1
+            if (ra > 300):
+                continue
             confusion_matrix[1][predicted_labels] += 1
         elif(label == 's'):
+            if (sa > 12):
+                continue
+            sa += 1
             confusion_matrix[2][predicted_labels] += 1
         elif(label == 'n'):
+            if (na > 300):
+                continue
+            na += 1
             confusion_matrix[3][predicted_labels] += 1
     
 
