@@ -101,21 +101,17 @@ void MOTION_NN::run_nn(q15_t* in_data, q15_t* out_data)
 {
 	// Run all layers
 	
-	// IP1: bias_decimal = 17, weight_decimal = 16, input_decimal = 00, output_decimal =  9
-	arm_fully_connected_q15(in_data, ip1_wt, IN_DIM, IP1_OUT_DIM, 8, 7, ip1_bias, ip1_out, vec_buffer);// 1 7
+	// IP1: bias_decimal = 17, weight_decimal = 16, input_decimal = 00, output_decimal =  11
+	arm_fully_connected_q15(in_data, ip1_wt, IN_DIM, IP1_OUT_DIM, 6, 5, ip1_bias, ip1_out, vec_buffer);// 1 7
   // RELU1
 	arm_relu_q15(ip1_out, IP1_OUT_DIM);
 
-	// IP2: bias_decimal = 17, weight_decimal = 17, input_decimal =  9, output_decimal =  9
-	arm_fully_connected_q15(ip1_out, ip2_wt, IP1_OUT_DIM, IP2_OUT_DIM, 8, 17, ip2_bias, ip2_out, vec_buffer);// 2 8
+	// IP2: bias_decimal = 17, weight_decimal = 17, input_decimal =  11, output_decimal =  11
+	arm_fully_connected_q15(ip1_out, ip2_wt, IP1_OUT_DIM, IP2_OUT_DIM, 6, 17, ip2_bias, ip2_out, vec_buffer);// 2 8
   // RELU2
 	arm_relu_q15(ip2_out, IP2_OUT_DIM);
 
-	// IP3: bias_decimal = 16, weight_decimal = 16, input_decimal =  9, output_decimal =  9
-	arm_fully_connected_q15(ip2_out, ip3_wt, IP2_OUT_DIM, OUT_DIM, 7, 16, ip3_bias, out_data, vec_buffer);// 2 9
+	// IP3: bias_decimal = 16, weight_decimal = 16, input_decimal =  11, output_decimal =  11
+	arm_fully_connected_q15(ip2_out, ip3_wt, IP2_OUT_DIM, OUT_DIM, 5, 16, ip3_bias, out_data, vec_buffer);// 2 9
 
 }
-
-
-
-
