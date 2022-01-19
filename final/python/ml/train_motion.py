@@ -26,6 +26,8 @@ def hook(module, feat_in, feat_out: torch.TensorType):
     dec_bits = 15 - int_bits
     # print("Int bits: %d, dec bits: %d" % (int_bits, dec_bits))
 
+
+
 def train():
     train_set = MotionSet(config["data_dir"])
     print("Train set length: %d" % len(train_set))
@@ -41,13 +43,18 @@ def train():
     optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
     loss_fn = config["loss_fn"]
 
-    for layer in model.mlp.children():
-        if isinstance(layer, torch.nn.Linear):
-            layer.register_forward_hook(hook=hook)
+    # for layer in model.mlp.children():
+    #     if isinstance(layer, torch.nn.Linear):
+    #         layer.register_forward_hook(hook=hook)
+
 
     best_acc = 0.0
     model.train()
     for e in range(epoch):
+        # l: 0, r: 1, s: 2, n: 3
+        correct = [0, 0, 0, 0]
+        in_correct = [0, 0, 0, 0]
+
         train_loss, train_acc = [], []
         for batch in tqdm(train_loader):
             motion, label = batch
@@ -60,10 +67,17 @@ def train():
             loss.backward()
             optimizer.step()
 
-            acc = (output.argmax(dim=-1) == label).float().mean()
+            pred = output.argmax(dim=-1)
+            for i, p in enumerate(pred):
+                if p == label[i]:
+                    correct[label[i]] += 1
+                else:
+                    in_correct[label[i]] += 1
+
+            acc = (pred == label).float().mean()
             train_loss.append(loss.item())
             train_acc.append(acc.item())
-        
+
         train_loss = sum(train_loss) / len(train_loss)
         train_acc = sum(train_acc) / len(train_acc)
         if best_acc < train_acc:
@@ -75,6 +89,11 @@ def train():
                 torch.save(model.state_dict(), save_path)
         
         print(f"[Overall {e + 1:04d}/{epoch:04d}] train loss: {train_loss:.5f}, train acc: {train_acc:.5f}, best train acc:{best_acc:.5f}")
+        print("Confution matrix:")
+        print("Left correct: %d, left incorrect: %d" % (correct[0], in_correct[0]))
+        print("Right correct: %d, right incorrect: %d" % (correct[1], in_correct[1]))
+        print("Stop correct: %d, stop incorrect: %d" % (correct[2], in_correct[2]))
+        print("None correct: %d, none incorrect: %d" % (correct[3], in_correct[3]))
 
 if __name__ == "__main__":
     train()

@@ -12,8 +12,7 @@ from motionnet_inference import Motionnet_Inference
 
 
 config = {
-    "model_dir": "../../models/motion_80.ckpt",
-    "data_dir" : "../../data/total_data.csv"
+    "model_dir": "../../models/motion_87.ckpt"
 }
 
 def write_params(params: torch.TensorType, file: FileIO, name: str):
