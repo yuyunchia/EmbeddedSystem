@@ -21,10 +21,10 @@ config = {
 def hook(module, feat_in, feat_out: torch.TensorType):
     p = feat_out.detach().cpu().numpy()
     min_value, max_value = np.min(p), np.max(p)
-    print("Min: %f, max: %f" % (min_value, max_value))
+    # print("Min: %f, max: %f" % (min_value, max_value))
     int_bits = int(np.ceil(np.log2(max(abs(min_value), abs(max_value)))))
     dec_bits = 15 - int_bits
-    print("Int bits: %d, dec bits: %d" % (int_bits, dec_bits))
+    # print("Int bits: %d, dec bits: %d" % (int_bits, dec_bits))
 
 
 
@@ -82,6 +82,7 @@ def train():
         train_acc = sum(train_acc) / len(train_acc)
         if best_acc < train_acc:
             best_acc = train_acc
+            print(best_acc)
             if best_acc > 0.85:
                 save_path = os.path.join(config["model_save_dir"], "motion_%d.ckpt" % int(best_acc * 100))
                 print("Saving model at %s" % save_path)
