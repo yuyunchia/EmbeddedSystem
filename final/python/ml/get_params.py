@@ -312,6 +312,6 @@ def run_quantize_inference():
 
 
 if __name__ == "__main__":
-    #get_params()
-    run_inference()
+    get_params()
+    # run_inference()
     
