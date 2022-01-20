@@ -12,7 +12,8 @@ from motionnet_inference import Motionnet_Inference
 
 
 config = {
-    "model_dir": "../../models/motion_87.ckpt"
+    "model_dir": "../../models/1.20_emb/motion_93.ckpt",
+    "data_dir": "../../data/filter_data_raw_80_1.csv"
 }
 
 def write_params(params: torch.TensorType, file: FileIO, name: str):
@@ -70,78 +71,78 @@ def run_inference():
         ##print(p.size)
 
         
-    net = Motionnet_Inference()
+    # net = Motionnet_Inference()
 
 
 
-    index_to_label = {
-        0: 'left',
-        1: 'right',
-        2: 'stop',
-        3: 'none'
-    }
+    # index_to_label = {
+    #     0: 'left',
+    #     1: 'right',
+    #     2: 'stop',
+    #     3: 'none'
+    # }
 
-    net = Motionnet_Inference()
+    # net = Motionnet_Inference()
    
 
-    net.load_weights(p_weight)
+    # net.load_weights(p_weight)
 
-    confusion_matrix = np.zeros( (4,4))
-    '''
-              left|  right|   stop|nothing|
-       left|      |       |       |       |
-      right|      |       |       |       |
-       stop|      |       |       |       |
-    nothing|      |       |       |       |
-    '''
+    # confusion_matrix = np.zeros( (4,4))
+    # '''
+    #           left|  right|   stop|nothing|
+    #    left|      |       |       |       |
+    #   right|      |       |       |       |
+    #    stop|      |       |       |       |
+    # nothing|      |       |       |       |
+    # '''
 
-    data = pd.read_csv(config["data_dir"])
-    data = data.values
-    num = len(data)
+    # data = pd.read_csv(config["data_dir"])
+    # data = data.values
+    # num = len(data)
 
-    la = 0
-    ra = 0
-    sa = 0
-    na = 0
+    # la = 0
+    # ra = 0
+    # sa = 0
+    # na = 0
 
-    for i in range(num):
-        label = data[i][1] ## 
-        inputdata = data[i][0].split(' ')
-        inputdata = [float(item) for item in inputdata]
-        inputdata = np.array(inputdata)
+    # for i in range(num):
+    #     label = data[i][1] ## 
+    #     inputdata = data[i][0].split(' ')
+    #     inputdata = [float(item) for item in inputdata]
+    #     inputdata = np.array(inputdata)
 
-        predictions = net.forward(inputdata)
-        predicted_labels = np.argmax(predictions, axis=0)
-        #print(index_to_label[predicted_labels])
+    #     predictions = net.forward(inputdata)
+    #     predicted_labels = np.argmax(predictions, axis=0)
+    #     #print(index_to_label[predicted_labels])
 
-        if (label == 'l'):
-            la += 1
-            if (la > 300):
-                continue
-            confusion_matrix[0][predicted_labels] += 1
-        elif(label == 'r'):
-            ra += 1
-            if (ra > 300):
-                continue
-            confusion_matrix[1][predicted_labels] += 1
-        elif(label == 's'):
-            if (sa > 12):
-                continue
-            sa += 1
-            confusion_matrix[2][predicted_labels] += 1
-        elif(label == 'n'):
-            if (na > 300):
-                continue
-            na += 1
-            confusion_matrix[3][predicted_labels] += 1
+    #     if (label == 'l'):
+    #         la += 1
+    #         if (la > 300):
+    #             continue
+    #         confusion_matrix[0][predicted_labels] += 1
+    #     elif(label == 'r'):
+    #         ra += 1
+    #         if (ra > 300):
+    #             continue
+    #         confusion_matrix[1][predicted_labels] += 1
+    #     elif(label == 's'):
+    #         if (sa > 12):
+    #             continue
+    #         sa += 1
+    #         confusion_matrix[2][predicted_labels] += 1
+    #     elif(label == 'n'):
+    #         if (na > 300):
+    #             continue
+    #         na += 1
+    #         confusion_matrix[3][predicted_labels] += 1
     
 
-    print("result of: ",config["model_dir"])
-    print("            left|   right|    stop| nothing|")
-    print("   left|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[0][0],confusion_matrix[0][1],confusion_matrix[0][2],confusion_matrix[0][3]) )
-    print("  right|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[1][0],confusion_matrix[1][1],confusion_matrix[1][2],confusion_matrix[1][3]) )
-    print("   stop|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[2][0],confusion_matrix[2][1],confusion_matrix[2][2],confusion_matrix[2][3]) )
-    print("nothing|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[3][0],confusion_matrix[3][1],confusion_matrix[3][2],confusion_matrix[3][3]) )
+    # print("result of: ",config["model_dir"])
+    # print("            left|   right|    stop| nothing|")
+    # print("   left|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[0][0],confusion_matrix[0][1],confusion_matrix[0][2],confusion_matrix[0][3]) )
+    # print("  right|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[1][0],confusion_matrix[1][1],confusion_matrix[1][2],confusion_matrix[1][3]) )
+    # print("   stop|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[2][0],confusion_matrix[2][1],confusion_matrix[2][2],confusion_matrix[2][3]) )
+    # print("nothing|    %4d|    %4d|    %4d|    %4d|" % (confusion_matrix[3][0],confusion_matrix[3][1],confusion_matrix[3][2],confusion_matrix[3][3]) )
 
 
     model = MotionNet()
